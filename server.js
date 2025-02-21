@@ -7,7 +7,7 @@ const server = require('http').createServer(app);  // pass the app
 const io = require('socket.io')(server);
 io.on('connection', socket => {
     socket.on('message', message => {
-        console.log('Received message:', message);
+        console.log( message);
         io.emit('message', message);  // broadcast the message to all connected clients
     });
     console.log('New user connected');  // a new user connected to the server
