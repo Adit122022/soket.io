@@ -18,6 +18,8 @@ const wss = new WebSocketServer({ port :8080});
  socket.on('message' ,(rawData)=>{
  console.log({rawData});
 const message = rawData.toString();
+console.log("Message :",message)
+console.log("IP :", ip)
  wss.clients.forEach((client)=>{
     if(client.readyState === WebSocket.OPEN) client.send(`Server BroadCast :${message}`)
  })
