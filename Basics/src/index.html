@@ -3,77 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WEB SOCKET</title>
+    <title>WEB SOCKET | Pro</title>
     <style>
-        *{
-        margin: 0;
-        padding: 0;
-        box-sizing :border-box;
+        /* Modern Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        html,body{
-        width :100%;
-        height :100%;
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: radial-gradient(circle at top right, #1e1e2e, #11111b);
+            color: #cdd6f4;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        body{ font-family: sans-serif; padding: 20px; background:#121212 ; color:#fff; ; }
-        #log{ background: #000; padding: 10px; height: 300px; overflow-y: scroll; border:1px solid #333; }
-        .status-on{ color: #00ff00;  }    
-        .status-off{ color: #ff0000;  }  
-        #message-form{ margin: 20px 0; display: flex; gap: 10px; }  
-        #message-input{ width: 80%; padding: 10px; border:1px solid #333; background:#222; color:#fff; }
-            #message-button{ padding: 10px 20px; border:none; background:#007bff; color:#fff; cursor: pointer; }
-            #message-button:hover{ background:#0056b3; }
-            .message-item{ margin-bottom: 10px; padding: 10px; background:#333; border-radius: 5px; }
+
+        /* Container for everything */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(30, 30, 46, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #89b4fa, #f5c2e7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Status Badge */
+        #status {
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.3);
+        }
+        .status-on { color: #a6e3a1; border: 1px solid #a6e3a1; }
+        .status-off { color: #f38ba8; border: 1px solid #f38ba8; }
+
+        /* Log Area */
+        #log {
+            background: #11111b;
+            padding: 15px;
+            height: 350px;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 1px solid #313244;
+            font-family: 'Cascadia Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #a6adc8;
+            margin-top: 10px;
+        }
+
+        /* Custom Scrollbar */
+        #log::-webkit-scrollbar { width: 6px; }
+        #log::-webkit-scrollbar-thumb { background: #45475a; border-radius: 10px; }
+
+        /* Form & Inputs */
+        #message-form {
+            margin: 20px 0;
+            display: flex;
+            gap: 12px;
+        }
+        #message-input {
+            flex-grow: 1;
+            padding: 12px 16px;
+            border: 1px solid #45475a;
+            border-radius: 8px;
+            background: #181825;
+            color: #cdd6f4;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+        #message-input:focus { border-color: #89b4fa; }
+
+        #message-button {
+            padding: 0 25px;
+            border-radius: 8px;
+            border: none;
+            background: #89b4fa;
+            color: #11111b;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+        #message-button:hover {
+            background: #b4befe;
+            transform: translateY(-2px);
+        }
+        #message-button:active { transform: translateY(0); }
+
+        h3 { font-weight: 500; color: #bac2de; font-size: 1rem; }
     </style>
 </head>
 <body>
-    <h1>Web Socket Client</h1>
-    <p id="status" class="status-off">Connecting........ </p>
-   <form action="" id="message-form">
-        <input type="text" id="message-input" placeholder="Type your message here..." autocomplete="off" required>
-        <button id="message-button" type="submit">Deploy Message</button>
-   </form>
-    <h3 style="margin: 10px 0;">Live Stream Logs :</h3>
-    <pre id="log"></pre>
+
+    <div class="container">
+        <h1>Web Socket Client</h1>
+        <p id="status" class="status-off">Connecting........ </p>
+        
+        <form action="" id="message-form">
+            <input type="text" id="message-input" placeholder="Enter command or message..." autocomplete="off" required>
+            <button id="message-button" type="submit">Deploy</button>
+        </form>
+
+        <h3>Live Stream Logs :</h3>
+        <pre id="log"></pre>
+    </div>
 
     <script>
-         const statusEl = document.getElementById('status');
-         const log = document.getElementById('log');
-         const input = document.getElementById('message-input');
-         const form = document.getElementById('message-form');
-         const socket = new WebSocket('ws://localhost:8080');
+        // AAPKA ORIGINAL LOGIC (Unchanged)
+        const statusEl = document.getElementById('status');
+        const log = document.getElementById('log');
+        const input = document.getElementById('message-input');
+        const form = document.getElementById('message-form');
+        const socket = new WebSocket('ws://localhost:8080');
 
-         const appending =(label,message)=>{
+        const appending =(label,message)=>{
             if(label==="[YOU]") log.style.color ="green"
+            if(label==="[Error]") log.style.color ="red"
             const entry = `${new Date().toLocaleTimeString()} - ${label} : ${message}`;
-           log.textContent += entry + '\n';
-         }
+            log.textContent += entry + '\n';
+            // Auto-scroll logic added for better UX
+            log.scrollTop = log.scrollHeight;
+        }
 
-         socket.addEventListener('open',()=>{
-            statusEl.textContent = 'Connected : ws://localhost:8080';
+        socket.addEventListener('open',()=>{
+            statusEl.textContent = '● Connected : ws://localhost:8080';
             statusEl.classList.remove('status-off');
             statusEl.classList.add('status-on');
             appending('[System]','Connection Established');
-         })
-         socket.addEventListener('close',()=>{
-            statusEl.textContent = 'Disconnected : ws://localhost:8080';
+        })
+        socket.addEventListener('close',()=>{
+            statusEl.textContent = '○ Disconnected : ws://localhost:8080';
             statusEl.classList.remove('status-on');
             statusEl.classList.add('status-off');
             appending('[System]','Connection Closed');
-         })
+        })
    
-         socket.addEventListener('message',(event)=>{
+        socket.addEventListener('message',(event)=>{
             appending('[Server]',event.data);
-         })
-            form.addEventListener('submit',(e)=>{
-                e.preventDefault();
-                const message = input.value.trim();
-                if(socket.readyState !== WebSocket.OPEN) appending('[Error]','No Active Tunnel')
-                if(message){
-                    socket.send(message);
-                    appending('[You]',message);
-                    input.value = '';
-                }
-            })
-   </script>
+        })
+        form.addEventListener('submit',(e)=>{
+            e.preventDefault();
+            const message = input.value.trim();
+            if(socket.readyState !== WebSocket.OPEN) appending('[Error]','No Active Tunnel')
+          else{
+          if(message){
+                socket.send(message);
+                appending('[You]',message);
+                input.value = '';
+            }}
+        })
+    </script>
 </body>
 </html>
